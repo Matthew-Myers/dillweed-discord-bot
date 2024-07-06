@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"internal/messagestore"
 	"os"
 	"os/signal"
 	"syscall"
@@ -58,6 +59,15 @@ func main() {
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
+	messagestore.StoreMessage(messagestore.MessageRecord{
+		Id:          m.ID,
+		CreatedAt:   m.Timestamp.Format("2006-01-02T15:04:05Z"),
+		AuthorId:    m.Author.ID,
+		GlobalName:  m.Author.GlobalName,
+		AuthorName:  m.Author.Username,
+		Content:     m.Content,
+		Attachments: m.Attachments,
+	})
 	if m.Author.ID == s.State.User.ID {
 		return
 	}

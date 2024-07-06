@@ -2,6 +2,8 @@ module dillweed
 
 go 1.22.4
 
+require internal/messagestore v1.0.0
+replace internal/messagestore => ./internal/messagestore
 
 require (
 	github.com/bwmarrin/discordgo v0.28.1 // indirect
