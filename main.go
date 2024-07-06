@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"internal/messagestore"
+	"math/rand/v2"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,6 +22,8 @@ func init() {
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.Parse()
 }
+
+var messageCache = messagestore.NewMessageCache(20)
 
 func main() {
 
@@ -54,23 +57,26 @@ func main() {
 	dg.Close()
 }
 
-// This function will be called (due to AddHandler above) every time a new
-// message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
-	messagestore.StoreMessage(messagestore.MessageRecord{
-		Id:          m.ID,
-		CreatedAt:   m.Timestamp.Format("2006-01-02T15:04:05Z"),
-		AuthorId:    m.Author.ID,
-		GlobalName:  m.Author.GlobalName,
-		AuthorName:  m.Author.Username,
-		Content:     m.Content,
-		Attachments: m.Attachments,
-	})
+
+	// store message and update the cache
+	messagestore.StoreMessage(m, messageCache)
+	// Ignore all messages created by the bot itself, endless loop of replies
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
+
+	// just going to respond to 1/10 messages roughly
+	if rand.IntN(10) == 1 {
+		fmt.Println("ASNWER MESSAGE")
+		channelTranscript, found := messageCache.Get(m.GuildID, m.ChannelID)
+		if !found {
+			fmt.Errorf("Records not found, something went wrong")
+			return
+		}
+		fmt.Println()
+	}
+
 	// If the message is "ping" reply with "Pong!"
 	if m.Content == "ping" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
