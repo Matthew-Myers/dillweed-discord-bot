@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"internal/messagestore"
-	"math/rand/v2"
 	"os"
 	"os/signal"
 	"syscall"
@@ -23,7 +22,7 @@ func init() {
 	flag.Parse()
 }
 
-var messageCache = messagestore.NewMessageCache(20)
+var messageStore = messagestore.NewMessageStore(25)
 
 func main() {
 
@@ -35,7 +34,7 @@ func main() {
 	}
 
 	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(messageCreate)
+	dg.AddHandler(messageStore.MessageCreateEventHandler)
 
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
@@ -55,35 +54,4 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	dg.Close()
-}
-
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	// store message and update the cache
-	messagestore.StoreMessage(m, messageCache)
-	// Ignore all messages created by the bot itself, endless loop of replies
-	if m.Author.ID == s.State.User.ID {
-		return
-	}
-
-	// just going to respond to 1/10 messages roughly
-	if rand.IntN(10) == 1 {
-		fmt.Println("ASNWER MESSAGE")
-		channelTranscript, found := messageCache.Get(m.GuildID, m.ChannelID)
-		if !found {
-			fmt.Errorf("Records not found, something went wrong")
-			return
-		}
-		fmt.Println()
-	}
-
-	// If the message is "ping" reply with "Pong!"
-	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
-	}
-
-	// If the message is "pong" reply with "Ping!"
-	if m.Content == "pong" {
-		s.ChannelMessageSend(m.ChannelID, "Ping!")
-	}
 }

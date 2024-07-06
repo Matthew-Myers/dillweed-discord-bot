@@ -1,6 +1,10 @@
 package messagestore
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"math/rand/v2"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 // Define a struct to represent your table's schema
 type MessageRecord struct {
@@ -16,7 +20,19 @@ type MessageRecord struct {
 
 const isSQLConfigured = false
 
-func StoreMessage(m *discordgo.MessageCreate, cache *MessageCache) {
+type MessageStore struct {
+	messageCache    *MessageCache
+	isSQLConfigured bool
+}
+
+func NewMessageStore(cacheLimit int) *MessageStore {
+	return &MessageStore{
+		messageCache:    NewMessageCache(cacheLimit),
+		isSQLConfigured: false,
+	}
+}
+
+func (ms *MessageStore) store(m *discordgo.MessageCreate) {
 
 	msgRec := MessageRecord{
 		Id:          m.ID,
@@ -28,7 +44,7 @@ func StoreMessage(m *discordgo.MessageCreate, cache *MessageCache) {
 		Attachments: m.Attachments,
 	}
 	// Strore the messsage in postgres
-	if isSQLConfigured {
+	if ms.isSQLConfigured {
 		// store in SQL
 	}
 
@@ -37,6 +53,24 @@ func StoreMessage(m *discordgo.MessageCreate, cache *MessageCache) {
 	//   Given this is going to be for a single server, this will be fine.
 	//   Max char count of a discord message is 2000 (ignoring nitro)
 	//   Worst case, 120 messages will end up consuming about 1GB of ram.
-	cache.Put(m.GuildID, m.ChannelID, msgRec)
+	ms.messageCache.Put(m.GuildID, m.ChannelID, msgRec)
+}
 
+func (ms *MessageStore) MessageCreateEventHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	// store message and update the cache
+	ms.store(m)
+
+	if respond() {
+	} else {
+	}
+
+}
+
+func respond() bool {
+	// just going to respond to 1/10 messages roughly
+	if rand.IntN(10) == 1 {
+		return true
+	}
+	return false
 }

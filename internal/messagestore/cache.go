@@ -19,17 +19,15 @@ func (c *MessageCache) Put(serverId, channelId string, record MessageRecord) {
 
 	if _, exists := c.data[serverId][channelId]; !exists {
 		c.data[serverId][channelId] = []MessageRecord{}
+		// Fill the cache with a DB read
 	}
 
 	channelCache := c.data[serverId][channelId]
 	if len(channelCache) >= c.maxRecords {
 		// Remove the oldest record
 		channelCache = channelCache[1:]
-	} else {
-		// Fill the cache with a DB read
-		//   For the first 20 messages in any given channel, there will be about 20 reads on empty data
-		//   C'est la vie
 	}
+
 	channelCache = append(channelCache, record)
 	c.data[serverId][channelId] = channelCache
 }
