@@ -1,7 +1,7 @@
 package messagestore
 
 import (
-	"math/rand/v2"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -58,19 +58,27 @@ func (ms *MessageStore) store(m *discordgo.MessageCreate) {
 
 func (ms *MessageStore) MessageCreateEventHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
+	// If the message is a command, ignore
+
 	// store message and update the cache
 	ms.store(m)
 
 	if respond() {
+		messages, hit := ms.messageCache.Get(m.GuildID, m.ChannelID)
+		if !hit {
+			// TODO: actually handle
+			log.Fatal("No messages in the cache,")
+		}
+		replyString := LLMRequest("You're a bot, respond with something sassy", messages)
+		log.Println("REPLY STRING")
+		log.Println(replyString)
 	} else {
+
 	}
 
 }
 
 func respond() bool {
-	// just going to respond to 1/10 messages roughly
-	if rand.IntN(10) == 1 {
-		return true
-	}
-	return false
+	// TODO: implement a reply algo
+	return true
 }

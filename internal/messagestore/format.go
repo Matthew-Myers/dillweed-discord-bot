@@ -5,22 +5,21 @@ const (
 	ChatML
 )
 
-type transcriptFormattor func(prompt string, msgs []MessageRecord) any
+type transcriptFormattor func(prompt string, msgs []MessageRecord) []OpenAIMessageFormat
 
-type openAIMessageFormat struct {
-	role    string
-	content string
+type OpenAIMessageFormat struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
 }
 
 // msgs should be ordered oldest -> most recent
-var openAIV1Format transcriptFormattor = func(prompt string, msgs []MessageRecord) any {
-	openAITranscript := []openAIMessageFormat{
-		{role: "system", content: prompt},
+var OpenAIV1Format transcriptFormattor = func(prompt string, msgs []MessageRecord) []OpenAIMessageFormat {
+	openAITranscript := []OpenAIMessageFormat{
+		{Role: "system", Content: prompt},
 	}
 
 	for _, msg := range msgs {
-		openAITranscript = append(openAITranscript, openAIMessageFormat{role: msg.AuthorName, content: msg.Content})
+		openAITranscript = append(openAITranscript, OpenAIMessageFormat{Role: msg.AuthorName, Content: msg.Content})
 	}
-
 	return openAITranscript
 }
