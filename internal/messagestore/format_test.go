@@ -38,8 +38,8 @@ var RECS = []MessageRecord{
 func TestOpenAiSystemPrompt(t *testing.T) {
 	sysPrompt := "system prompt"
 	var testArr []MessageRecord
-	var response = openAIV1Format(sysPrompt, testArr)
-	expected := []openAIMessageFormat{
+	var response = OpenAIV1Format(sysPrompt, testArr)
+	expected := []OpenAIMessageFormat{
 		{role: "system", content: sysPrompt},
 	}
 
@@ -52,8 +52,8 @@ func TestOpenAIFormatHandlesDateOrdering(t *testing.T) {
 	sysPrompt := "system prompt"
 	testArr := make([]MessageRecord, len(RECS))
 	copy(testArr, RECS)
-	var response = openAIV1Format(sysPrompt, testArr)
-	expected := []openAIMessageFormat{
+	var response = OpenAIV1Format(sysPrompt, testArr)
+	expected := []OpenAIMessageFormat{
 		{role: "system", content: sysPrompt},
 		{role: RECS[0].AuthorName, content: RECS[0].Content},
 		{role: RECS[2].AuthorName, content: RECS[2].Content},

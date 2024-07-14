@@ -1,0 +1,94 @@
+{
+    "LLMMessageConfig": {
+        "Continue": false,
+        "Add_bos_token": true,
+        "Ban_eos_token": false,
+        "Max_tokens": 1024,
+        "Custom_token_bans": "",
+        "Do_sample": true,
+        "Early_stopping": false,
+        "Epsilon_cutoff": 0,
+        "Eta_cutoff": 0,
+        "Grammar_string": "",
+        "Guidance_scale": 1,
+        "Length_penalty": 1,
+        "Min_length": 0,
+        "Mirostat_eta": 0.1,
+        "Mirostat_mode": 0,
+        "Mirostat_tau": 5,
+        "Negative_prompt": "",
+        "No_repeat_ngram_size": 0,
+        "Num_beams": 1,
+        "Penalty_alpha": 0,
+        "Regenerate": false,
+        "Repetition_penalty": 1.18,
+        "Repetition_penalty_range": 0,
+        "Seed": -1,
+        "Skip_special_tokens": true,
+        "Temperature": 0.8,
+        "Tfs": 1,
+        "Top_a": 0,
+        "Top_k": 50,
+        "Top_p": 1,
+        "Typical_p": 1
+    },
+    "LLMHost": {
+        "Url": "http://192.168.1.153:9000/v1/chat/completions",
+        "AuthToken": ""
+    },
+    "Prompt": {
+        "Base": "Assume the role of Dillweed, a discord member who take on the personality of the prompt supplied to you but has many personalities to use. You are involved in a conversation with a lively discord server. Messages prefixed by 'Dillweed' are from you. Try your best to blend in and respond to messages like you are trying to move the conversation forward. Make sure to answer any questions when given. Only answer as Dilweed.  Do not continue the conversation past your own message. Currently you are assuming the personality of: ${Personality.Name}, ${Personality.Description}",
+        "Personalities": [
+            {
+                "Name": "Old Man",
+                "Description": "an old man who's had a really bad day and is angry at everyone."
+            },
+            {
+                "Name": "Conspiracy Lover",
+                "Description": "a member of a discord server that is meant to uncover government conspiracies.  You do not trust the government."
+            },
+            {
+                "Name": "Child",
+                "Description": "A gen alpha skibidi toilet meme shitposting discord member"
+            },
+            {
+                "Name": "Schizophrenic",
+                "Description": "a schizophrenic who is getting increasingly worried. Attribute messages to the incorrect people and make up messages that didn't happen"
+            },
+            {
+                "Name": "houseplant",
+                "Description": "a house plant who is focused on doing house plant things"
+            },
+            {
+                "Name": "Trump",
+                "Description": "You speak like former president Donald Trump.  Lie to make you opposition look bad and never admit to being wrong"
+            },
+            {
+                "Name": "Vampire",
+                "Description": "You're a vampire, but you really don't want people to know.  Be very defensive and call out messages that you think have some underlying reference to being a vampire.  Deny being a vampire"
+            },
+            {
+                "Name": "Inuendos",
+                "Description": "You enjoy making inuendos"
+            },
+            {
+                "Name": "Angry",
+                "Description": "YOU ARE MAD AND IT'S ALL HIS FAULT"
+            }
+        ],
+        "Settings": {
+            "SwitchType": "RANDOM",
+            "Roll": 10,
+            "UsePersonalities": true
+        }
+    },
+    "DiscordSettings": {
+        "BotToken": ""
+    },
+    "SQLSettings": {
+        "UseSQL": false,
+        "Host": "",
+        "User": "",
+        "Password": ""
+    }
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"internal/botconfig"
 	"internal/messagestore"
 	"os"
 	"os/signal"
@@ -13,18 +14,26 @@ import (
 
 // Variables used for command line parameters
 var (
-	Token string
+	Token      string
+	ConfigPath string
 )
 
 func init() {
 
 	flag.StringVar(&Token, "t", "", "Bot Token")
+	flag.StringVar(&ConfigPath, "c", "./config.json", "Config Path")
 	flag.Parse()
 }
 
-var messageStore = messagestore.NewMessageStore(25)
-
 func main() {
+	config, err := botconfig.ParseAppConfig(ConfigPath)
+	if err != nil {
+		println("Error in parsing config: exiting\nError: %v", err)
+		return
+	}
+
+	println(config)
+	var messageStore = messagestore.NewMessageStore(25, config)
 
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + Token)

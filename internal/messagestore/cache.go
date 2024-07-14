@@ -1,35 +1,46 @@
 package messagestore
 
+import "internal/botconfig"
+
 type MessageCache struct {
-	data       map[string]map[string][]MessageRecord
+	data       map[string]map[string]*ChannelStore
 	maxRecords int
+	config     *botconfig.AppConfig
 }
 
-func NewMessageCache(maxRecords int) *MessageCache {
+type ChannelStore struct {
+	messages         []MessageRecord
+	personalityIndex int
+}
+
+func NewMessageCache(maxRecords int, config *botconfig.AppConfig) *MessageCache {
 	return &MessageCache{
-		data:       make(map[string]map[string][]MessageRecord),
+		data:       make(map[string]map[string]*ChannelStore),
 		maxRecords: maxRecords,
+		config:     config,
 	}
 }
 
 func (c *MessageCache) Put(serverId, channelId string, record MessageRecord) {
 	if _, exists := c.data[serverId]; !exists {
-		c.data[serverId] = make(map[string][]MessageRecord)
+		c.data[serverId] = make(map[string]*ChannelStore)
 	}
 
 	if _, exists := c.data[serverId][channelId]; !exists {
-		c.data[serverId][channelId] = []MessageRecord{}
+		c.data[serverId][channelId] = &ChannelStore{
+			messages:         []MessageRecord{},
+			personalityIndex: c.config.Prompt.Settings.InitialIndex,
+		}
 		// Fill the cache with a DB read
 	}
 
 	channelCache := c.data[serverId][channelId]
-	if len(channelCache) >= c.maxRecords {
+	if len(channelCache.messages) >= c.maxRecords {
 		// Remove the oldest record
-		channelCache = channelCache[1:]
+		channelCache.messages = channelCache.messages[1:]
 	}
 
-	channelCache = append(channelCache, record)
-	c.data[serverId][channelId] = channelCache
+	channelCache.messages = append(channelCache.messages, record)
 }
 
 func (c *MessageCache) Delete(serverId, channelId string) {
@@ -41,10 +52,10 @@ func (c *MessageCache) Delete(serverId, channelId string) {
 	}
 }
 
-func (c *MessageCache) Get(serverId, channelId string) ([]MessageRecord, bool) {
+func (c *MessageCache) ChannelStore(serverId, channelId string) (*ChannelStore, bool) {
 	if channelCache, exists := c.data[serverId]; exists {
-		if records, exists := channelCache[channelId]; exists {
-			return records, true
+		if channelStore, exists := channelCache[channelId]; exists {
+			return channelStore, true
 		}
 	}
 	return nil, false
